@@ -37,8 +37,8 @@ class skaiciuokles:
         question2= Label(frame1, text="Įveskite savo ūgį centimetrais: ", justify=CENTER, anchor='w')
         question2.grid(sticky=W, column=0, row=4)
 
-        self.ugis= Entry(frame1, validate="key",validatecommand=(vcmd_frame1,'%P'))
-        self.ugis.grid(column=0, row=5)
+        self.ugis_frame1= Entry(frame1, validate="key",validatecommand=(vcmd_frame1,'%P'))
+        self.ugis_frame1.grid(column=0, row=5)
 
         self.button1= tkinter.Button(frame1, text= "Skaičiuoti KMI", command=lambda: self.kmi())
         self.button1.grid(column=0,row=8, sticky='E')
@@ -57,6 +57,7 @@ class skaiciuokles:
 
         self.r= IntVar()
         self.a=IntVar()
+        self.b= IntVar()
 
         Radiobutton(frame3, text="Vyras", variable=self.r, value=1).grid(column=1,row=0, sticky=W)
         Radiobutton(frame3, text="Moteris", variable=self.r, value=2).grid(column=1,row=0, sticky=E)
@@ -81,12 +82,12 @@ class skaiciuokles:
         self.label_frame3.grid(row=9,columnspan=5, sticky="W")
 
         ##################### FRAME 2 #########################################
+        Radiobutton(frame2, text="Vyras", variable=self.b, value=8).grid(column=0,row=1, sticky=W)
+        Radiobutton(frame2, text="Moteris", variable=self.b, value=9).grid(column=0,row=1, sticky=E)
 
-        self.r= IntVar()
-        self.a=IntVar()
-
-        Radiobutton(frame2, text="Vyras", variable=self.r, value=1).grid(column=0,row=1, sticky=W)
-        Radiobutton(frame2, text="Moteris", variable=self.r, value=2).grid(column=0,row=1, sticky=E)
+        Radiobutton(frame2, text="Priaugti", variable=self.a, value=3,command=self.interactive).grid(column=1,row=20, sticky=W)
+        Radiobutton(frame2, text="Numesti", variable=self.a, value=4,command=self.interactive).grid(column=2,row=20, sticky=E)
+        # self.label_text_frame2.set(self.message_frame2)
 
         question1= Label(frame2, text="Pasirinkite savo lytį: ", justify=CENTER, anchor='w')
         question1.grid(sticky=W, column=0, row=0)
@@ -107,14 +108,14 @@ class skaiciuokles:
         question3= Label(frame2, text="Įveskite savo ūgį centimetrais: ", justify=CENTER, anchor='w')
         question3.grid(sticky=W, column=0, row=6)
 
-        self.ugis= Entry(frame2, validate="key",validatecommand=(vcmd_frame2,'%P'))
-        self.ugis.grid(column=0, row=7)
+        self.ugis_frame2= Entry(frame2, validate="key",validatecommand=(vcmd_frame2,'%P'))
+        self.ugis_frame2.grid(column=0, row=7)
 
         question4= Label(frame2, text= "Įveskite savo aktyvumo lygį: ", justify=LEFT, anchor="w")
         question4.grid(sticky=W, column=0, row=8)
 
         question5= Label(frame2, text= "Jeigu norite priaugti arba numesti svorio, pasirinkite tinkamą variantą: ", justify=LEFT, anchor="w")
-        question5.grid(sticky=W, columnspan=3, row=11)
+        question5.grid(sticky=W, columnspan=3, row=18)
 
   
 
@@ -132,7 +133,7 @@ class skaiciuokles:
         #Columnspan leidzia eiti per kelis stulpelius
 
         self.button3= tkinter.Button(frame2, text= "Dienos kalorijų norma", command=lambda: self.Zmogaus_info())
-        self.button3.grid(column=2,row=15,sticky='E')
+        self.button3.grid(column=2,row=12,sticky='E')
 
     
     def validate(self,new_text):
@@ -150,15 +151,15 @@ class skaiciuokles:
 
     def kmi(self):
         #si funkcijos dalis skirta identifikuoti neivestas reiksmes
-        if len(self.svoris_frame1.get())==0 and len(self.ugis.get())==0:
+        if len(self.svoris_frame1.get())==0 and len(self.ugis_frame1.get())==0:
             self.message_frame1="Neįvestas ūgis ir svoris"
         elif len(self.svoris_frame1.get())==0:
             self.message_frame1="Neįvestas svoris"
-        elif len(self.ugis.get())==0:
+        elif len(self.ugis_frame1.get())==0:
             self.message_frame1="Neįvestas ūgis"
         else:
 
-            kmi=round(float(self.svoris_frame1.get())/((float(self.ugis.get())/100)**2), 2)
+            kmi=round(float(self.svoris_frame1.get())/((float(self.ugis_frame1.get())/100)**2), 2)
             if kmi <= 18.5:
                 komentaras = ("Tai reiškia, kad Jūsų svoris yra nepakankamas")
             elif kmi >18.5 and kmi <=25:
@@ -190,13 +191,13 @@ class skaiciuokles:
 
     def Zmogaus_info(self):        
         
-        if not self.r.get() or len(self.ugis.get())==0 or len(self.svoris_frame2.get())==0 or len(self.amzius.get())==0 or self.clicked.get()=="Išskleisti":
+        if not self.b.get() or len(self.ugis_frame2.get())==0 or len(self.svoris_frame2.get())==0 or len(self.amzius.get())==0 or self.clicked.get()=="Išskleisti":
             neivesta=[]
 
-            if not self.r.get():
+            if not self.b.get():
                 neivesta.append("Neįvesta lytis")
 
-            if len(self.ugis.get())==0:
+            if len(self.ugis_frame2.get())==0:
                 neivesta.append("neįvestas ūgis")
 
             if len(self.svoris_frame2.get())==0:
@@ -211,18 +212,18 @@ class skaiciuokles:
 
         else:
 
-            lytis=float(self.r.get())
+            lytis=float(self.b.get())
             
             
-            if lytis==1:
+            if lytis==8:
                 x=66
-                xu=5.003*float(self.ugis.get())
+                xu=5.003*float(self.ugis_frame2.get())
                 xs=13.75*float(self.svoris_frame2.get())
                 xa=6.755*float(self.amzius.get())
                 BMA_rezulatas= x + xs + xu - xa
-            elif lytis==2:
+            elif lytis==9:
                 x=655.1
-                xu=1.850*float(self.ugis.get())
+                xu=1.850*float(self.ugis_frame2.get())
                 xs=9.563*float(self.svoris_frame2.get())
                 xa=4.676*float(self.amzius.get())
                 BMA_rezulatas= x + xs + xu - xa
@@ -253,11 +254,16 @@ class skaiciuokles:
         
 
     def interactive(self):
-        a=IntVar()
-        if a.get()==3:
+        
+        if self.a.get()==3:
             kalorijos=self.ALC+500
             kl= Label(self.frame2, text= f"Siekiant priaugti svorio, Jūsų suvartojama dienos kalorijų normą turėtų būti {kalorijos} Kcal       ", justify=LEFT, anchor="w")
-            kl.grid(sticky=W, columnspan=3, row=14)
+            kl.grid(sticky=W, columnspan=3, row=21)
+        
+        elif self.a.get()==4:
+            kalorijos=self.ALC-500
+            kl= Label(self.frame2, text= f"Siekiant numesti svorį, Jūsų suvartojama dienos kalorijų normą turėtų būti {kalorijos} Kcal          ", justify=LEFT, anchor="w")
+            kl.grid(sticky=W, columnspan=3, row=21)
 
 
  
@@ -270,8 +276,3 @@ langas1=skaiciuokles(root1)
 root1.title("Skaičiuoklė")
 root1.geometry("800x400")
 root1.mainloop()
-
-
-        #BMA apskaiciavimo formule
-        # For women, BMR = 655.1 + (9.563 x weight in kg) + (1.850 x height in cm) - (4.676 x age in years)
-        # For men, BMR = 66.47 + (13.75 x weight in kg) + (5.003 x height in cm) - (6.755 x age in years)
