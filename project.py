@@ -269,7 +269,6 @@ class skaiciuokles:
  
 
         
-        
 
 root1= Tk()
 langas1=skaiciuokles(root1)
