@@ -3,6 +3,16 @@ import imp
 from tkinter import *
 from tkinter import messagebox
 import ast
+import sqlite3
+
+con = sqlite3.connect('testuserdata.db')
+cur = con.cursor()
+cur.execute('''CREATE TABLE IF NOT EXISTS record(
+                    username text PRIMARY KEY, 
+                    password text
+                )
+            ''')
+con.commit()
 
 
 root= Tk()
@@ -15,27 +25,21 @@ def signin():
     username= user.get()
     password=passw.get()
 
-    file=open("datasheet.txt", "r")
-    d=file.read()
-    r=ast.literal_eval(d)
-    file.close()
-
-    print(r.keys())
-    print(r.values())
-
-    if username in r.keys() and password==r[username]:
-        screen=Toplevel(root)
-        screen.title ("App")
-        screen.geometry("925x500+300+200")
-        screen.config(bg="white")
-
-        Label(screen, text="Hello World!", bg="#fff", font=("Calibri(Body)", 50, "bold")).pack(expand=True)
-        screen.mainloop()
-
+    con = sqlite3.connect('testuserdata.db')
+    c = con.cursor()
+    c.execute("Select * from record where username==:name", {"name":username})
+    if c.fetchone()==None:
+        messagebox.showinfo("Sign up", "Username doesn't exist")
     else:
-        messagebox.showerror("Invalid", "Invalid username or password!")
+        c.execute("Select * from record where username==:name and password==:pwd", {"name":username, "pwd":password})
+        if c.fetchone()==None:
+            messagebox.showerror("Invalid", "Invalid username or password!")
+        else:  
+            messagebox.showinfo("Sign up", "Signed In")
+    con.commit()
 
-############################@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+############################   SIGN UP FORM #########################
 
 def signup_command():
     window=Toplevel(root)
@@ -50,32 +54,24 @@ def signup_command():
         password=passw.get()
         confim_passw=conf.get()
 
-        if password==confim_passw:
-            try:
-                file=open("datasheet.txt", "r+")
-                d=file.read()
-                r=ast.literal_eval(d)
+        con = sqlite3.connect('testuserdata.db')
+        acur = con.cursor()
 
-                dict2={username:password}
-                r.update(dict2)
-                file.truncate(0)
-                file.close()
-
-                file=open("datasheet.txt", "w")
-                w=file.write(str(r))
-
+        acur.execute("Select * from record where username==:name", {"name":username})
+        if acur.fetchone()!=None:
+            messagebox.showerror("Invalid", "Selected user name already exists!")
+        else:
+            if password==confim_passw:
+                acur.execute("INSERT INTO record VALUES (:name, :password)", {
+                    'name': user.get(),
+                    'password': passw.get()})
                 messagebox.showinfo("Signup", "Sucessfully sign up")
                 window.destroy()
-
-            except:
-                file=open("datasheet.txt", "w")
-                pp=str({"username":"password"})
-                file.write(pp)
-                file.close()
+            else:
+                messagebox.showerror("Invalid", "Both Password should match!")
+            
     
-        else:
-            messagebox.showerror("Invalid", "Both Password should match!")
-
+        con.commit()
 
     def sign():
         window.destroy()
@@ -162,9 +158,6 @@ def signup_command():
 
     window.mainloop()
 
-#####################################@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
 
 img=PhotoImage(file="login.png")
 Label(root, image=img, border=0, bg="white").place(x=50, y=90)
@@ -219,17 +212,5 @@ label.place(x=75,y=270)
 
 sign_up= Button(frame, width=6, text="Sign up", border=0, bg="white", cursor="hand2", fg="#57a1f8", command=signup_command)
 sign_up.place(x=215, y=270)
-
-
-
-
-
-
-
-
-
-
-
-
 
 root.mainloop()
