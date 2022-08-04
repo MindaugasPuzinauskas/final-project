@@ -1,15 +1,17 @@
-from curses import window
-import imp
+import email
 from tkinter import *
 from tkinter import messagebox
-import ast
 import sqlite3
+import re
 
-con = sqlite3.connect('testuserdata.db')
+
+regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+con = sqlite3.connect('userdata.db')
 cur = con.cursor()
 cur.execute('''CREATE TABLE IF NOT EXISTS record(
-                    username text PRIMARY KEY, 
-                    password text
+                    username TEXT PRIMARY KEY,
+                    email TEXT NOT NULL UNIQUE,
+                    password TEXT
                 )
             ''')
 con.commit()
@@ -25,7 +27,7 @@ def signin():
     username= user.get()
     password=passw.get()
 
-    con = sqlite3.connect('testuserdata.db')
+    con = sqlite3.connect('userdata.db')
     c = con.cursor()
     c.execute("Select * from record where username==:name", {"name":username})
     if c.fetchone()==None:
@@ -53,8 +55,10 @@ def signup_command():
         username=user.get()
         password=passw.get()
         confim_passw=conf.get()
+        e_mail= e_email.get()
 
-        con = sqlite3.connect('testuserdata.db')
+
+        con = sqlite3.connect('userdata.db')
         acur = con.cursor()
 
         acur.execute("Select * from record where username==:name", {"name":username})
@@ -62,9 +66,11 @@ def signup_command():
             messagebox.showerror("Invalid", "Selected user name already exists!")
         else:
             if password==confim_passw:
-                acur.execute("INSERT INTO record VALUES (:name, :password)", {
+                acur.execute("INSERT INTO record VALUES (:name, :password, :email)", {
                     'name': user.get(),
-                    'password': passw.get()})
+                    'password': passw.get(),
+                    'email': e_email.get()})
+
                 messagebox.showinfo("Signup", "Sucessfully sign up")
                 window.destroy()
             else:
@@ -80,7 +86,7 @@ def signup_command():
     img=PhotoImage(file="login.png")
     Label(window, image=img, border=0, bg="white").place(x=50, y=90)
 
-    frame=Frame(window, width=350, height=390, bg="#fff")
+    frame=Frame(window, width=450, height=570, bg="#fff")
     frame.place(x=480, y=50)
 
     heading=Label(frame, text="Sign up", fg="#57a1f8", bg="white", font=("Microsoft Yahei UI Light", 23,"bold"))
@@ -105,7 +111,7 @@ def signup_command():
 
     Frame(frame, width=295, height=2, bg="black").place(x=25, y=107)
 
-#############___________PASWORD ENTRY______________#############
+#############___________PASSWORD ENTRY______________#############
 
 
 
@@ -119,12 +125,12 @@ def signup_command():
 
 
     passw=Entry(frame, width=25, fg="black", border=0, bg="white", font=("Microsoft Yahei UI Light", 11))
-    passw.place(x=30, y=150)
+    passw.place(x=30, y=220)
     passw.insert(0, "Password")
     passw.bind("<FocusIn>", on_enter)
     passw.bind("<FocusOut>", on_leave)
 
-    Frame(frame, width=295, height=2, bg="black").place(x=25, y=177)
+    Frame(frame, width=295, height=2, bg="black").place(x=25, y=317)
 
     #############___________CONFIRMATION ENTRY______________#############
 
@@ -134,25 +140,49 @@ def signup_command():
     def on_leave(e):
         if conf.get()=="":
             conf.insert(0, "Confirm Password")
+            
 
 
 
     conf=Entry(frame, width=25, fg="black", border=0, bg="white", font=("Microsoft Yahei UI Light", 11))
-    conf.place(x=30, y=220)
+    conf.place(x=30, y=290)
     conf.insert(0, "Confirm Password")
     conf.bind("<FocusIn>", on_enter)
     conf.bind("<FocusOut>", on_leave)
 
     Frame(frame, width=295, height=2, bg="black").place(x=25, y=247)
 
+#############___________EMAIL ENTRY______________#############
+
+    def on_enter(e):
+        e_email.delete(0, "end")
+
+    def on_leave(e):
+        if e_email.get()=="":
+            e_email.insert(0, "Email")
+                
+
+
+
+    e_email=Entry(frame, width=25, fg="black", border=0, bg="white", font=("Microsoft Yahei UI Light", 11))
+    e_email.place(x=30, y=150)
+    e_email.insert(0, "Email")
+    e_email.bind("<FocusIn>", on_enter)
+    e_email.bind("<FocusOut>", on_leave)
+
+    Frame(frame, width=295, height=2, bg="black").place(x=25, y=177)
+
+
+
+
 #############___________SIGN UP BUTTON______________#############
 
-    Button(frame, width=39, pady=7, text="Sign Up", fg="#57a1f8", bg="#57a1f8", border=0, command=signup).place(x=35, y=280)
+    Button(frame, width=39, pady=7, text="Sign Up", fg="#57a1f8", bg="#57a1f8", border=0, command=signup).place(x=35, y=350)
     label=Label(frame, text="I have an account", fg="black", bg="white", font=("Microsoft Yahei UI Light", 9))
-    label.place(x=90, y=340)
+    label.place(x=90, y=410)
 
     signin=Button(frame, width=6, text="Sign in", border=0, bg="white", cursor="hand2", fg="#57a1f8", command=sign)
-    signin.place(x=200, y=340)
+    signin.place(x=200, y=410)
 
 
 
@@ -168,7 +198,7 @@ frame.place(x=480, y=70)
 heading=Label(frame, text="Sign In", fg="#57a1f8", bg="white", font=("Microsoft YaHei UI Light", 23, "bold"))
 heading.place(x=100, y=5)
 
-#############___________USERNAME ENTRY______________#############
+#############___________USERNAME ENTRY SIGN IN______________#############
 
 def on_enter(e):
     user.delete(0, "end")
@@ -186,7 +216,7 @@ user.bind("<FocusOut>", on_leave)
 
 Frame(frame, width=295, height=2, bg="black").place(x=25, y=107)
 
-#############___________PASSWORD ENTRY______________#############
+#############___________PASSWORD ENTRY SIGN______________#############
 
 def on_enter(e):
     passw.delete(0, "end")
