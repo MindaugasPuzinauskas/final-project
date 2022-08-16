@@ -1,9 +1,44 @@
-from calendar import FRIDAY
 import tkinter as tk
 import sqlite3
 from tkinter import *
 import re
 from turtle import dot
+
+calories1=0
+calories2=0
+calories3=0
+calories4=0
+calories5=0
+calories6=0
+calories7=0
+protein1=0
+protein2=0
+protein3=0
+protein4=0
+protein5=0
+protein6=0
+protein7=0
+carbs1=0
+carbs2=0
+carbs3=0
+carbs4=0
+carbs5=0
+carbs6=0
+carbs7=0
+fat1=0
+fat2=0
+fat3=0
+fat4=0
+fat5=0
+fat6=0
+fat7=0
+sugars1=0
+sugars2=0
+sugars3=0
+sugars4=0
+sugars5=0
+sugars6=0
+sugars7=0
 
 
 
@@ -41,21 +76,64 @@ frame1=Frame(root, width=5)
 
 def clicked():
     global list_data
+    con_clk = sqlite3.connect('data.db')
+    cur_clk = con_clk.cursor()
+    cur_clk.execute("SELECT * FROM produktai WHERE produktas==:product", {"product":content.get()})
+    # con.commit()
+ 
     if clk.get()=="Pirmadienis":
         listbox1.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
+        calories1=+cur_clk.fetchone()[2]
+        
+        # protein1=+cur_clk.fetchone()[3]
+        # carbs1=+cur_clk.fetchone()[4]
+        # fat1=+cur_clk.fetchone()[5]
+        # sugars1=+cur_clk.fetchone()[6]
+
     elif clk.get()=="Antradienis":
         listbox2.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
+        calories2=+cur_clk.fetchone()[2]
+        protein2=+cur_clk.fetchone()[3]
+        carbs2=+cur_clk.fetchone()[4]
+        fat2=+cur_clk.fetchone()[5]
+        sugars2=+cur_clk.fetchone()[6]
     elif clk.get()=="Trečiadienis":
         listbox3.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
+        calories3=+cur_clk.fetchone()[2]
+        protein3=+cur_clk.fetchone()[3]
+        carbs3=+cur_clk.fetchone()[4]
+        fat3=+cur_clk.fetchone()[5]
+        sugars3=+cur_clk.fetchone()[6]
     elif clk.get()=="Ketvirtadienis":
         listbox4.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
+        calories4=+cur_clk.fetchone()[2]
+        protein4=+cur_clk.fetchone()[3]
+        carbs4=+cur_clk.fetchone()[4]
+        fat4=+cur_clk.fetchone()[5]
+        sugars4=+cur_clk.fetchone()[6]    
     elif clk.get()=="Penktadienis":
         listbox5.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
+        calories5=+cur_clk.fetchone()[2]
+        protein5=+cur_clk.fetchone()[3]
+        carbs5=+cur_clk.fetchone()[4]
+        fat5=+cur_clk.fetchone()[5]
+        sugars5=+cur_clk.fetchone()[6]
     elif clk.get()=="Šeštadienis":
         listbox6.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
+        calories6=+cur_clk.fetchone()[2]
+        protein6=+cur_clk.fetchone()[3]
+        carbs6=+cur_clk.fetchone()[4]
+        fat6=+cur_clk.fetchone()[5]
+        sugars6=+cur_clk.fetchone()[6]
     elif clk.get()=="Sekmadienis":
         listbox7.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
+        calories7=+cur_clk.fetchone()[2]
+        protein7=+cur_clk.fetchone()[3]
+        carbs7=+cur_clk.fetchone()[4]
+        fat7=+cur_clk.fetchone()[5]
+        sugars7=+cur_clk.fetchone()[6]
     list_data.append(content.get())
+# what iz dis shit list data
 
 def delete():
     global list_data
@@ -248,8 +326,8 @@ Sunday_label.grid(column=3, row=13)
 listbox7 = tk.Listbox(root, width=40)
 listbox7.grid(column=3, row=14, padx=5)
 
-Results1=Label(text="Rezultatai")
-Results1.grid(column=0, row=9, sticky="w")
+Results1=Label(text=calories1)
+Results1.grid(column=1, row=4, sticky="w")
 
 bquit = tk.Button(root, text="Quit and save", command=quit)
 bquit.grid(column=0, row=6, sticky="e")
