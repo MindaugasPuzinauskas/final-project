@@ -1,8 +1,26 @@
+from ctypes import alignment
 import tkinter as tk
 import sqlite3
 from tkinter import *
 import re
-from turtle import dot
+from turtle import dot, left
+
+
+con = sqlite3.connect('userdatatest.db')
+cur = con.cursor()
+cur.execute('''CREATE TABLE IF NOT EXISTS userplan(
+                    weekday text,
+                    diettime text,
+                    product text, 
+                    quantity number
+                )
+            ''')
+con.commit()
+
+root = tk.Tk()
+root.title("Produktų pasirinkimas")
+root.geometry("1600x2560")
+list_data = []
 
 calories1=0
 calories2=0
@@ -40,25 +58,6 @@ sugars5=0
 sugars6=0
 sugars7=0
 
-
-
-con = sqlite3.connect('userdatatest.db')
-cur = con.cursor()
-cur.execute('''CREATE TABLE IF NOT EXISTS userplan(
-                    weekday text,
-                    diettime text,
-                    product text, 
-                    quantity number
-                )
-            ''')
-con.commit()
-
-root = tk.Tk()
-root.title("Produktų pasirinkimas")
-root.geometry("1600x2560")
-list_data = []
-
-
 #--------------------------------------------------------------------------------------------------------
 
 frame1=Frame(root, width=5)
@@ -75,65 +74,132 @@ frame1=Frame(root, width=5)
 #   pass
 
 def clicked():
-    global list_data
+    global list_data, calories1, calories2, calories3, calories4, calories5, calories6, calories7
+    global protein1, protein2, protein3, protein4, protein5, protein6, protein7
+    global carbs1, carbs2, carbs3, carbs4, carbs5, carbs6, carbs7
+    global fat1, fat2, fat3, fat4, fat5, fat6, fat7
+    global sugars1, sugars2, sugars3, sugars4, sugars5, sugars6, sugars7
+    global monday_results, tuesday_results, wednesday_results, thursday_results, friday_results, saturday_results, sunday_results
+
+    # protein3=0
+    # protein4=0
+    # protein5=0
+    # protein6=0
+    # protein7=0
+    # carbs1=0
+    # carbs2=0
+    # carbs3=0
+    # carbs4=0
+    # carbs5=0
+    # carbs6=0
+    # carbs7=0
+    # fat1=0
+    # fat2=0
+    # fat3=0
+    # fat4=0
+    # fat5=0
+    # fat6=0
+    # fat7=0
+    # sugars1=0
+    # sugars2=0
+    # sugars3=0
+    # sugars4=0
+    # sugars5=0
+    # sugars6=0
+    # sugars7=0
     con_clk = sqlite3.connect('data.db')
     cur_clk = con_clk.cursor()
     cur_clk.execute("SELECT * FROM produktai WHERE produktas==:product", {"product":content.get()})
     # con.commit()
- 
+    sqlresult=cur_clk.fetchone()
+
     if clk.get()=="Pirmadienis":
         listbox1.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
-        calories1=+cur_clk.fetchone()[2]
         
-        # protein1=+cur_clk.fetchone()[3]
-        # carbs1=+cur_clk.fetchone()[4]
-        # fat1=+cur_clk.fetchone()[5]
-        # sugars1=+cur_clk.fetchone()[6]
-
+        calories1+=((content1.get()/100)*sqlresult[2])
+        protein1+=((content1.get()/100)*sqlresult[3])
+        carbs1+=((content1.get()/100)*sqlresult[4])
+        fat1+=((content1.get()/100)*sqlresult[5])
+        sugars1+=((content1.get()/100)*sqlresult[6])
+        # monday_results="Viso kalorijų: " + str(round(calories1,1)) + " kcal \nbaltymų: " + str(round(protein1,1)) +  " g\nriebalų: " + str(round(fat1,1)) + " g\nangliavandenių: " + str(round(carbs1,1)) + " g\niš kurių cukrų: " + str(round(sugars1,1)) + " g"
+        monday_results="Viso kalorijų:  " + str(round(calories1,1)) + " kcal \nbaltymų:        " + str(round(protein1,1)) +  " g\nriebalų:        " + str(round(fat1,1)) + " g\nangliavandenių: " + str(round(carbs1,1)) + " g\niš kurių cukrų: " + str(round(sugars1,1)) + " g"
+    
     elif clk.get()=="Antradienis":
         listbox2.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
-        calories2=+cur_clk.fetchone()[2]
-        protein2=+cur_clk.fetchone()[3]
-        carbs2=+cur_clk.fetchone()[4]
-        fat2=+cur_clk.fetchone()[5]
-        sugars2=+cur_clk.fetchone()[6]
+        
+        calories2+=((content1.get()/100)*sqlresult[2])
+        protein2+=((content1.get()/100)*sqlresult[3])
+        carbs2+=((content1.get()/100)*sqlresult[4])
+        fat2+=((content1.get()/100)*sqlresult[5])
+        sugars2+=((content1.get()/100)*sqlresult[6])
+        # monday_results="Viso kalorijų: " + str(round(calories1,1)) + " kcal \nbaltymų: " + str(round(protein1,1)) +  " g\nriebalų: " + str(round(fat1,1)) + " g\nangliavandenių: " + str(round(carbs1,1)) + " g\niš kurių cukrų: " + str(round(sugars1,1)) + " g"
+        tuesday_results="Viso kalorijų:  " + str(round(calories2,1)) + " kcal \nbaltymų:        " + str(round(protein2,1)) +  " g\nriebalų:        " + str(round(fat2,1)) + " g\nangliavandenių: " + str(round(carbs2,1)) + " g\niš kurių cukrų: " + str(round(sugars2,1)) + " g"
+        
     elif clk.get()=="Trečiadienis":
         listbox3.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
-        calories3=+cur_clk.fetchone()[2]
-        protein3=+cur_clk.fetchone()[3]
-        carbs3=+cur_clk.fetchone()[4]
-        fat3=+cur_clk.fetchone()[5]
-        sugars3=+cur_clk.fetchone()[6]
+        
+        calories3+=((content1.get()/100)*sqlresult[2])
+        protein3+=((content1.get()/100)*sqlresult[3])
+        carbs3+=((content1.get()/100)*sqlresult[4])
+        fat3+=((content1.get()/100)*sqlresult[5])
+        sugars3+=((content1.get()/100)*sqlresult[6])
+        # monday_results="Viso kalorijų: " + str(round(calories1,1)) + " kcal \nbaltymų: " + str(round(protein1,1)) +  " g\nriebalų: " + str(round(fat1,1)) + " g\nangliavandenių: " + str(round(carbs1,1)) + " g\niš kurių cukrų: " + str(round(sugars1,1)) + " g"
+        wednesday_results="Viso kalorijų:  " + str(round(calories3,1)) + " kcal \nbaltymų:        " + str(round(protein3,1)) +  " g\nriebalų:        " + str(round(fat3,1)) + " g\nangliavandenių: " + str(round(carbs3,1)) + " g\niš kurių cukrų: " + str(round(sugars3,1)) + " g"
+        
     elif clk.get()=="Ketvirtadienis":
         listbox4.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
-        calories4=+cur_clk.fetchone()[2]
-        protein4=+cur_clk.fetchone()[3]
-        carbs4=+cur_clk.fetchone()[4]
-        fat4=+cur_clk.fetchone()[5]
-        sugars4=+cur_clk.fetchone()[6]    
+
+
+        calories4+=((content1.get()/100)*sqlresult[2])
+        protein4+=((content1.get()/100)*sqlresult[3])
+        carbs4+=((content1.get()/100)*sqlresult[4])
+        fat4+=((content1.get()/100)*sqlresult[5])
+        sugars4+=((content1.get()/100)*sqlresult[6])
+        # monday_results="Viso kalorijų: " + str(round(calories1,1)) + " kcal \nbaltymų: " + str(round(protein1,1)) +  " g\nriebalų: " + str(round(fat1,1)) + " g\nangliavandenių: " + str(round(carbs1,1)) + " g\niš kurių cukrų: " + str(round(sugars1,1)) + " g"
+        thursday_results="Viso kalorijų:  " + str(round(calories4,1)) + " kcal \nbaltymų:        " + str(round(protein4,1)) +  " g\nriebalų:        " + str(round(fat4,1)) + " g\nangliavandenių: " + str(round(carbs4,1)) + " g\niš kurių cukrų: " + str(round(sugars4,1)) + " g"
+
+
     elif clk.get()=="Penktadienis":
         listbox5.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
-        calories5=+cur_clk.fetchone()[2]
-        protein5=+cur_clk.fetchone()[3]
-        carbs5=+cur_clk.fetchone()[4]
-        fat5=+cur_clk.fetchone()[5]
-        sugars5=+cur_clk.fetchone()[6]
+
+        calories5+=((content1.get()/100)*sqlresult[2])
+        protein5+=((content1.get()/100)*sqlresult[3])
+        carbs5+=((content1.get()/100)*sqlresult[4])
+        fat5+=((content1.get()/100)*sqlresult[5])
+        sugars5+=((content1.get()/100)*sqlresult[6])
+        # monday_results="Viso kalorijų: " + str(round(calories1,1)) + " kcal \nbaltymų: " + str(round(protein1,1)) +  " g\nriebalų: " + str(round(fat1,1)) + " g\nangliavandenių: " + str(round(carbs1,1)) + " g\niš kurių cukrų: " + str(round(sugars1,1)) + " g"
+        friday_results="Viso kalorijų:  " + str(round(calories5,1)) + " kcal \nbaltymų:        " + str(round(protein5,1)) +  " g\nriebalų:        " + str(round(fat5,1)) + " g\nangliavandenių: " + str(round(carbs5,1)) + " g\niš kurių cukrų: " + str(round(sugars5,1)) + " g"
+
     elif clk.get()=="Šeštadienis":
         listbox6.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
-        calories6=+cur_clk.fetchone()[2]
-        protein6=+cur_clk.fetchone()[3]
-        carbs6=+cur_clk.fetchone()[4]
-        fat6=+cur_clk.fetchone()[5]
-        sugars6=+cur_clk.fetchone()[6]
+
+        calories6+=((content1.get()/100)*sqlresult[2])
+        protein6+=((content1.get()/100)*sqlresult[3])
+        carbs6+=((content1.get()/100)*sqlresult[4])
+        fat6+=((content1.get()/100)*sqlresult[5])
+        sugars6+=((content1.get()/100)*sqlresult[6])
+        # monday_results="Viso kalorijų: " + str(round(calories1,1)) + " kcal \nbaltymų: " + str(round(protein1,1)) +  " g\nriebalų: " + str(round(fat1,1)) + " g\nangliavandenių: " + str(round(carbs1,1)) + " g\niš kurių cukrų: " + str(round(sugars1,1)) + " g"
+        saturday_results="Viso kalorijų:  " + str(round(calories6,1)) + " kcal \nbaltymų:        " + str(round(protein6,1)) +  " g\nriebalų:        " + str(round(fat6,1)) + " g\nangliavandenių: " + str(round(carbs6,1)) + " g\niš kurių cukrų: " + str(round(sugars6,1)) + " g"
+    
     elif clk.get()=="Sekmadienis":
         listbox7.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
-        calories7=+cur_clk.fetchone()[2]
-        protein7=+cur_clk.fetchone()[3]
-        carbs7=+cur_clk.fetchone()[4]
-        fat7=+cur_clk.fetchone()[5]
-        sugars7=+cur_clk.fetchone()[6]
+
+        calories7+=((content1.get()/100)*sqlresult[2])
+        protein7+=((content1.get()/100)*sqlresult[3])
+        carbs7+=((content1.get()/100)*sqlresult[4])
+        fat7+=((content1.get()/100)*sqlresult[5])
+        sugars7+=((content1.get()/100)*sqlresult[6])
+        # monday_results="Viso kalorijų: " + str(round(calories1,1)) + " kcal \nbaltymų: " + str(round(protein1,1)) +  " g\nriebalų: " + str(round(fat1,1)) + " g\nangliavandenių: " + str(round(carbs1,1)) + " g\niš kurių cukrų: " + str(round(sugars1,1)) + " g"
+        sunday_results="Viso kalorijų:  " + str(round(calories7,1)) + " kcal \nbaltymų:        " + str(round(protein7,1)) +  " g\nriebalų:        " + str(round(fat7,1)) + " g\nangliavandenių: " + str(round(carbs7,1)) + " g\niš kurių cukrų: " + str(round(sugars7,1)) + " g"
+    
     list_data.append(content.get())
-# what iz dis shit list data
+    results1.set(monday_results)
+    results2.set(tuesday_results)
+    results3.set(wednesday_results)
+    results4.set(thursday_results)
+    results5.set(friday_results)
+    results6.set(saturday_results)
+    results7.set(sunday_results)
 
 def delete():
     global list_data
@@ -278,59 +344,99 @@ button_delete_selected3 = tk.Button(text="Delete Selected", command=delete_selec
 button_delete_selected3.grid(column=3, row=3, sticky="w")
 
 button_delete_selected4 = tk.Button(text="Delete Selected", command=delete_selected4)
-button_delete_selected4.grid(column=0, row=15, sticky="w")
+button_delete_selected4.grid(column=0, row=11, sticky="w")
 
 button_delete_selected5 = tk.Button(text="Delete Selected", command=delete_selected5)
-button_delete_selected5.grid(column=1, row=15, sticky="w")
+button_delete_selected5.grid(column=1, row=11, sticky="w")
 
 button_delete_selected6 = tk.Button(text="Delete Selected", command=delete_selected6)
-button_delete_selected6.grid(column=2, row=15, sticky="w")
+button_delete_selected6.grid(column=2, row=11, sticky="w")
 
 button_delete_selected7 = tk.Button(text="Delete Selected", command=delete_selected7)
-button_delete_selected7.grid(column=3, row=15, sticky="w")
+button_delete_selected7.grid(column=3, row=11, sticky="w")
 
 # -------- LISTBOXES ---------
 
-Monday_label=Label(text="PIRMADIENIS")
-Monday_label.grid(column=1, row=1, padx=10)
-listbox1 = tk.Listbox(root, height=10, width=40)
-listbox1.grid(column=1, row=2, padx=5)
+monday_label=Label(text="PIRMADIENIS")
+monday_label.grid(column=1, row=1, padx=5)
+listbox1 = tk.Listbox(root, height=10, width=39)
+listbox1.grid(column=1, row=2, padx=3)
 
-Tuesday_label=Label(text="ANTRADIENIS")
-Tuesday_label.grid(column=2, row=1)
-listbox2 = tk.Listbox(root, width=40)
-listbox2.grid(column=2, row=2, padx=5)
+monday_results=""
+results1=StringVar()
+results1.set(monday_results)
+results1_label=Label(root, textvariable=results1, justify=tk.LEFT)
+results1_label.grid(column=1, row=4, rowspan=5, sticky="w")
 
-Wednesday_label=Label(text="TREČIADIENIS")
-Wednesday_label.grid(column=3, row=1)
-listbox3 = tk.Listbox(root, width=40)
-listbox3.grid(column=3, row=2, padx=5)
+tuesday_label=Label(text="ANTRADIENIS")
+tuesday_label.grid(column=2, row=1)
+listbox2 = tk.Listbox(root, width=39)
+listbox2.grid(column=2, row=2, padx=3)
 
-Thursday_label=Label(text="KETVIRTADIENIS")
-Thursday_label.grid(column=0, row=13)
-listbox4 = tk.Listbox(root, width=40)
-listbox4.grid(column=0, row=14, padx=5)
+tuesday_results=""
+results2=StringVar()
+results2.set(tuesday_results)
+results2_label=Label(root, textvariable=results2, justify=tk.LEFT)
+results2_label.grid(column=2, row=4, rowspan=5, sticky="w")
 
-Friday_label=Label(text="PENKTADIENIS")
-Friday_label.grid(column=1, row=13)
-listbox5 = tk.Listbox(root, width=40)
-listbox5.grid(column=1, row=14, padx=5)
+wednesday_label=Label(text="TREČIADIENIS")
+wednesday_label.grid(column=3, row=1)
+listbox3 = tk.Listbox(root, width=39)
+listbox3.grid(column=3, row=2, padx=3)
 
-Saturday_label=Label(text="ŠEŠTADIENIS")
-Saturday_label.grid(column=2, row=13)
-listbox6 = tk.Listbox(root, width=40)
-listbox6.grid(column=2, row=14, padx=5)
+wednesday_results=""
+results3=StringVar()
+results3.set(wednesday_results)
+results3_label=Label(root, textvariable=results3, justify=tk.LEFT)
+results3_label.grid(column=3, row=4, rowspan=5, sticky="w")
 
-Sunday_label=Label(text="SEKMADIENIS")
-Sunday_label.grid(column=3, row=13)
-listbox7 = tk.Listbox(root, width=40)
-listbox7.grid(column=3, row=14, padx=5)
+thursday_label=Label(text="KETVIRTADIENIS")
+thursday_label.grid(column=0, row=9)
+listbox4 = tk.Listbox(root, width=39)
+listbox4.grid(column=0, row=10, padx=3)
 
-Results1=Label(text=calories1)
-Results1.grid(column=1, row=4, sticky="w")
+thursday_results=""
+results4=StringVar()
+results4.set(thursday_results)
+results4_label=Label(root, textvariable=results4, justify=tk.LEFT)
+results4_label.grid(column=0, row=12, rowspan=5, sticky="w")
+
+friday_label=Label(text="PENKTADIENIS")
+friday_label.grid(column=1, row=9)
+listbox5 = tk.Listbox(root, width=39)
+listbox5.grid(column=1, row=10, padx=3)
+
+friday_results=""
+results5=StringVar()
+results5.set(friday_results)
+results5_label=Label(root, textvariable=results5, justify=tk.LEFT)
+results5_label.grid(column=1, row=12, rowspan=5, sticky="w")
+
+saturday_label=Label(text="ŠEŠTADIENIS")
+saturday_label.grid(column=9, row=13)
+listbox6 = tk.Listbox(root, width=39)
+listbox6.grid(column=2, row=10, padx=3)
+
+saturday_results=""
+results6=StringVar()
+results6.set(saturday_results)
+results6_label=Label(root, textvariable=results6, justify=tk.LEFT)
+results6_label.grid(column=2, row=12, rowspan=5, sticky="w")
+
+sunday_label=Label(text="SEKMADIENIS")
+sunday_label.grid(column=3, row=9)
+listbox7 = tk.Listbox(root, width=39)
+listbox7.grid(column=3, row=10, padx=3)
+
+sunday_results=""
+results7=StringVar()
+results7.set(sunday_results)
+results7_label=Label(root, textvariable=results7, justify=tk.LEFT)
+results7_label.grid(column=3, row=12, rowspan=5, sticky="w")
 
 bquit = tk.Button(root, text="Quit and save", command=quit)
 bquit.grid(column=0, row=6, sticky="e")
+
 
 
 
@@ -355,7 +461,7 @@ def my_down(my_widget):
     l1.focus()
     l1.selection_set(0)
 
-l1= tk.Listbox(root, height=10, width=40, relief="flat",
+l1= tk.Listbox(root, height=10, width=39, relief="flat",
     bg="black", highlightcolor= "white")
 l1.grid(column=0, row=2)
 
@@ -369,40 +475,5 @@ def get_data(*args):
 l1.bind("<<ListboxSelect>>", my_upd)
 content.trace("w", get_data)
 
-#retrievedata()
 root.mainloop()
 
-
-# import sqlite3
-
-# def getAllRows():
-#     try:
-#         connection= sqlite3.connect("data.db")
-#         cursor= connection.cursor()
-#         print("Connected")
-
-#         sqlite_select_query= ''' SELECT * from produktai'''
-#         cursor.execute(sqlite_select_query)
-#         records= cursor.fetchall()
-#         print("Total rows are: ", len(records))
-#         print("Printing each row")
-#         for row in records:
-#             print("ID: ", row[0])
-#             print("Produktas: ", row[1])
-#             print("Kalorijos: ", row[2])
-#             print("baltymai: ", row[3])
-#             print("angliavandeniai: ", row[4])
-#             print("riebalai: ", row[5])
-#             print("Cukrus: ", row[6])
-#             print("\n")
-
-#         cursor.close()
-
-#     except sqlite3.Error as error:
-#         print("Failed to read data from table", error)
-#     finally:
-#         if connection:
-#             connection.close()
-#             print("The Sqlite connection is closed")
-
-# getAllRows()
