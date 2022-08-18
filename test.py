@@ -114,7 +114,7 @@ def clicked():
     sqlresult=cur_clk.fetchone()
 
     if clk.get()=="Pirmadienis":
-        listbox1.insert(tk.END, clk2.get().upper() + ":  "+content.get()+ ", "+str(content1.get()) + "g")
+        listbox1.insert(tk.END, clk2.get().upper() + ": "+content.get()+ ", * "+str(content1.get()) + "g")
         
         calories1+=((content1.get()/100)*sqlresult[2])
         protein1+=((content1.get()/100)*sqlresult[3])
@@ -212,13 +212,33 @@ def delete():
     listbox7.delete(0, tk.END)
     list_data = []
 
+
 def delete_selected1():
     global list_data
 
     try:
         selected1= listbox1.get(listbox1.curselection())
+        m=re.search(': (.*), *', selected1)
+        if m:
+            product_name = m.group(1)
+        n=re.search(',* (\d*)g', selected1)
+        if n:
+            svoris = n.group(1)
+
+        # start=selected1.find(": ") + len(": ")
+        # end= selected1.find(", *")
+        # substring=selected1[start:end]
+        # print(found)
+        con5= sqlite3.connect("data.db")
+        cur5= con5.cursor()
+        cur5.execute("SELECT * FROM produktai WHERE produktas==:prd", {"prd":product_name})
+        result5=(cur5.fetchall())
+        # print(result5)
+        print(svoris)
+
         listbox1.delete(tk.ANCHOR)
         list_data.pop(list_data.index(selected1))
+    
     except:
         pass
 
@@ -328,32 +348,7 @@ quantity=tk.Entry(root,textvariable=content1)
 quantity.grid(column=0, row=5, sticky="w")
 
 
-button = tk.Button(root, text="Add Item", command=clicked)
-button.grid(column=0, row=6, sticky="w")
 
-button_delete = tk.Button(text="Clear all", command=delete)
-button_delete.grid(column=0, row=6)
-
-button_delete_selected1 = tk.Button(text="Delete Selected", command=delete_selected1)
-button_delete_selected1.grid(column=1, row=3, sticky="w")
-
-button_delete_selected2 = tk.Button(text="Delete Selected", command=delete_selected2)
-button_delete_selected2.grid(column=2, row=3, sticky="w")
-
-button_delete_selected3 = tk.Button(text="Delete Selected", command=delete_selected3)
-button_delete_selected3.grid(column=3, row=3, sticky="w")
-
-button_delete_selected4 = tk.Button(text="Delete Selected", command=delete_selected4)
-button_delete_selected4.grid(column=0, row=11, sticky="w")
-
-button_delete_selected5 = tk.Button(text="Delete Selected", command=delete_selected5)
-button_delete_selected5.grid(column=1, row=11, sticky="w")
-
-button_delete_selected6 = tk.Button(text="Delete Selected", command=delete_selected6)
-button_delete_selected6.grid(column=2, row=11, sticky="w")
-
-button_delete_selected7 = tk.Button(text="Delete Selected", command=delete_selected7)
-button_delete_selected7.grid(column=3, row=11, sticky="w")
 
 # -------- LISTBOXES ---------
 
@@ -413,7 +408,7 @@ results5_label=Label(root, textvariable=results5, justify=tk.LEFT)
 results5_label.grid(column=1, row=12, rowspan=5, sticky="w")
 
 saturday_label=Label(text="ŠEŠTADIENIS")
-saturday_label.grid(column=9, row=13)
+saturday_label.grid(column=2, row=9)
 listbox6 = tk.Listbox(root, width=39)
 listbox6.grid(column=2, row=10, padx=3)
 
@@ -433,6 +428,33 @@ results7=StringVar()
 results7.set(sunday_results)
 results7_label=Label(root, textvariable=results7, justify=tk.LEFT)
 results7_label.grid(column=3, row=12, rowspan=5, sticky="w")
+#BUTTONS 
+button = tk.Button(root, text="Add Item", command=clicked)
+button.grid(column=0, row=6, sticky="w")
+
+button_delete = tk.Button(text="Clear all", command=delete)
+button_delete.grid(column=0, row=6)
+
+button_delete_selected1 = tk.Button(text="Delete Selected", command=delete_selected1)
+button_delete_selected1.grid(column=1, row=3, sticky="w")
+
+button_delete_selected2 = tk.Button(text="Delete Selected", command=delete_selected2)
+button_delete_selected2.grid(column=2, row=3, sticky="w")
+
+button_delete_selected3 = tk.Button(text="Delete Selected", command=delete_selected3)
+button_delete_selected3.grid(column=3, row=3, sticky="w")
+
+button_delete_selected4 = tk.Button(text="Delete Selected", command=delete_selected4)
+button_delete_selected4.grid(column=0, row=11, sticky="w")
+
+button_delete_selected5 = tk.Button(text="Delete Selected", command=delete_selected5)
+button_delete_selected5.grid(column=1, row=11, sticky="w")
+
+button_delete_selected6 = tk.Button(text="Delete Selected", command=delete_selected6)
+button_delete_selected6.grid(column=2, row=11, sticky="w")
+
+button_delete_selected7 = tk.Button(text="Delete Selected", command=delete_selected7)
+button_delete_selected7.grid(column=3, row=11, sticky="w")
 
 bquit = tk.Button(root, text="Quit and save", command=quit)
 bquit.grid(column=0, row=6, sticky="e")
