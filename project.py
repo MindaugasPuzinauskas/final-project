@@ -1,7 +1,12 @@
 from tkinter import *
 import tkinter
 from tkinter import ttk
-from click import command
+from turtle import width
+from PIL import ImageTk, Image
+import sqlite3
+import tkinter as tk
+import re
+from tkinter import messagebox
 
 class skaiciuokles:
     def __init__(self,langas):
@@ -12,18 +17,21 @@ class skaiciuokles:
         frame2= Frame(notebook_tab, width=500, height=500, bg="grey")
         self.frame2=frame2
         frame3=Frame(notebook_tab, width=500, height=500, bg="grey")
-        frame4=Frame(notebook_tab, width=500, height=500, bg="grey")
+        self.frame4=Frame(notebook_tab, width=500, height=500, bg="grey")
+        frame4=self.frame4
+        frame5=Frame(notebook_tab, width=500, height=500, bg="grey")
 
         frame1.pack(fill="both", expand=1)
         frame2.pack(fill="both", expand=1)
         frame3.pack(fill="both", expand=1)
         frame4.pack(fill="both", expand=1)
-
+        frame5.pack(fill="both", expand=1)
 
         notebook_tab.add(frame1, text="KMI Skaičiuoklė")
         notebook_tab.add(frame2, text="KCAL Skaičiuoklė")
         notebook_tab.add(frame3, text="Kiek reikia išgerti vandens?")
-        notebook_tab.add(frame4, text="Maisto produktų KCAL skaičiuoklė")
+        notebook_tab.add(frame4, text="Produkto maistinė vertė")
+        notebook_tab.add(frame5, text="Mitybos planas")
 
         ################################ FRAME 1 ######################################
 
@@ -51,7 +59,6 @@ class skaiciuokles:
         #Padarom, kad teskstas butu matomas lenteleje ir kad ji butu galima pakeisti
         self.label_frame1 = Label(frame1, textvariable=self.label_text_frame1)
         self.label_frame1.grid(row=9,columnspan=5, sticky="W")
-
 
         ############################ FRAME 3 #################################
 
@@ -82,6 +89,7 @@ class skaiciuokles:
         self.label_frame3.grid(row=9,columnspan=5, sticky="W")
 
         ##################### FRAME 2 #########################################
+
         Radiobutton(frame2, text="Vyras", variable=self.b, value=8).grid(column=0,row=1, sticky=W)
         Radiobutton(frame2, text="Moteris", variable=self.b, value=9).grid(column=0,row=1, sticky=E)
 
@@ -117,8 +125,6 @@ class skaiciuokles:
         question5= Label(frame2, text= "Jeigu norite priaugti arba numesti svorio, pasirinkite tinkamą variantą: ", justify=LEFT, anchor="w")
         question5.grid(sticky=W, columnspan=3, row=18)
 
-  
-
         self.message_frame2=""
         self.label_text_frame2 = StringVar()
         self.label_text_frame2.set(self.message_frame2)
@@ -134,6 +140,83 @@ class skaiciuokles:
 
         self.button3= tkinter.Button(frame2, text= "Dienos kalorijų norma", command=lambda: self.Zmogaus_info())
         self.button3.grid(column=2,row=12,sticky='E')
+
+        ##################### FRAME 4 #########################################
+        
+        self.calories_1=0
+        self.protein_1=0
+        self.carbs_1=0
+        self.fat_1=0
+        self.sugars_1=0
+
+        con2= sqlite3.connect("data.db")
+        self.cur2= con2.cursor()
+        statement= "SELECT produktas FROM produktai"
+        self.cur2.execute(statement)
+        result=(self.cur2.fetchall())
+
+        self.my_list=[r for r, in result]
+
+        product=Label(frame4, text="Pasirinkite produktą")
+        product.grid(column=0, row=0, sticky="w")
+
+        self.product_entry = tk.StringVar()
+        self.entry = tk.Entry(frame4, textvariable=self.product_entry)
+        self.entry.grid(column=0, row=1)
+
+        self.food_results="Produkto vertė 100 g\n\nKalorijos: 0 kcal \nbaltymų: 0 g\nriebalų: 0 g\nangliavandenių: 0 g\niš kurių cukrų: 0 g"
+        self.food=StringVar()
+        self.food.set(self.food_results)
+        food_label=Label(frame4, textvariable=self.food, justify=tk.LEFT)
+        food_label.grid(column=3, row=1, rowspan=5, sticky="w")
+
+        self.l1= tk.Listbox(frame4, height=10, width=39, relief="flat",
+        bg="black",highlightcolor= "white")
+        self.l1.grid(column=0, row=2)
+
+        button4= Button(self.frame4, text= "Apskaičiuoti produkto vertę", command= self.button_clicked)
+        button4.grid(column=0,row=4,sticky='E')
+
+        self.l1.bind("<<ListboxSelect>>", self.my_upd)
+        self.product_entry.trace("w", self.get_data)
+
+    def button_clicked(self):
+
+        try:
+
+            self.cur2.execute("SELECT * FROM produktai WHERE produktas==:prod", {"prod":self.product_entry.get()})
+            food_result=(self.cur2.fetchone())
+            self.calories_1=food_result[2]
+            self.protein_1=food_result[3]
+            self.carbs_1=food_result[4]
+            self.fat_1=food_result[5]
+            self.sugars_1=food_result[6]
+            food_results2="Produkto vertė 100 g\n\nKalorijos:  " + str(round(self.calories_1,1)) + " kcal \nbaltymų:        " + str(round(self.protein_1,1)) +  " g\nriebalų:        " + str(round(self.fat_1,1)) + " g\nangliavandenių: " + str(round(self.carbs_1,1)) + " g\niš kurių cukrų: " + str(round(self.sugars_1,1)) + " g"
+            self.food.set(food_results2)
+
+        except:
+
+            messagebox.showerror("Invalid", "Pasirinkite produktą iš sąrašo!")
+            self.food.set(self.food_results)
+
+    def my_upd(self, my_widget):
+
+        my_w= my_widget.widget
+        index= int (my_w.curselection()[0])
+        value= my_w.get(index)
+        self.product_entry.set(value)
+        self.l1.delete(0, END)
+
+    def get_data(self, *args):
+        search_str=self.entry.get()
+        self.l1.delete(0, END)
+        for element in self.my_list:
+            if(re.match(search_str, element, re.IGNORECASE)):
+                self.l1.insert(tk.END, element)
+
+
+
+        ##################### MAIN FUNCTIONS FOR 1-3 FRAME #########################################
 
     
     def validate(self,new_text):
@@ -214,7 +297,6 @@ class skaiciuokles:
 
             lytis=float(self.b.get())
             
-            
             if lytis==8:
                 x=66
                 xu=5.003*float(self.ugis_frame2.get())
@@ -227,8 +309,6 @@ class skaiciuokles:
                 xs=9.563*float(self.svoris_frame2.get())
                 xa=4.676*float(self.amzius.get())
                 BMA_rezulatas= x + xs + xu - xa
-
-        
 
             aktyvumo_lygis = self.clicked.get()
             labai_mazas=1.2
@@ -248,10 +328,8 @@ class skaiciuokles:
             elif aktyvumo_lygis== "Labai didelis (sunkios treniruotės, aktyvus darbas)":
                 self.ALC=round(labai_didelis* BMA_rezulatas)
         
-            
             self.message_frame2=f"Jūsų dienos kalorijų norma yra {self.ALC} Kcal"
         self.label_text_frame2.set(self.message_frame2)
-        
 
     def interactive(self):
         
@@ -265,10 +343,6 @@ class skaiciuokles:
             kl= Label(self.frame2, text= f"Siekiant numesti svorį, Jūsų suvartojama dienos kalorijų normą turėtų būti {kalorijos} Kcal          ", justify=LEFT, anchor="w")
             kl.grid(sticky=W, columnspan=3, row=21)
 
-
- 
-
-        
 
 root1= Tk()
 langas1=skaiciuokles(root1)
